@@ -238,6 +238,15 @@ body{background:var(--bg);color:var(--gray-d);font-family:"Noto Sans JP",sans-se
 .form-sel option{background:#1A2438;color:#fff;}
 .tel-hint-box{margin-top:10px;padding:14px 16px;background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.18);border-radius:10px;font-size:13px;color:rgba(255,255,255,.75);line-height:1.9;text-align:center;}
 .tel-hint-box strong{color:white;font-size:15px;display:block;margin-top:4px;letter-spacing:.05em;}
+/* ── Toast ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:rgba(20,30,50,.96);color:white;padding:14px 20px;border-radius:14px;
+  font-size:13px;line-height:1.75;text-align:center;z-index:9999;
+  max-width:min(340px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.35);
+  opacity:0;transition:opacity .3s ease,transform .3s ease;pointer-events:none;
+  border:.5px solid rgba(255,255,255,.1);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast-icon{font-size:22px;display:block;margin-bottom:5px;}
 </style>
 </head>
 <body>
@@ -598,7 +607,8 @@ function checkTelHint(){
   updateLineUrl();
 }
 
-function updateLineUrl(){
+// メッセージ文章を生成して返す
+function buildLineMessage(){
   const arr=SYMS.filter(s=>sel.has(s.id));
   const syms=arr.length?arr.map(s=>s.name).join("・"):"未選択";
   const name=document.getElementById("nameInput").value.trim()||"未入力";
@@ -606,16 +616,32 @@ function updateLineUrl(){
   const v2=document.getElementById("date2").value;
   const d1=v1==="tel"?"お電話にてご相談希望":v1||"未定";
   const d2=v2==="tel"?"お電話にてご相談希望":v2||"未定";
-  const t=`【BackBone 初回カウンセリング予約】
-
-お名前：${name}
-お悩み：${syms}
-第一希望：${d1}
-第二希望：${d2}
-
-※ 紹介カードからのご予約`;
-  document.getElementById("lineBtn").href=`https://line.me/R/oaMessage/@710sifho?text=${encodeURIComponent(t)}`;
+  return `【BackBone 初回カウンセリング予約】\n\nお名前：${name}\nお悩み：${syms}\n第一希望：${d1}\n第二希望：${d2}\n\n※ 紹介カードからのご予約`;
 }
+function updateLineUrl(){/* リアルタイム更新は不要になったが互換用に残す */}
+
+// トースト表示
+function showToast(msg){
+  const el=document.getElementById("toast");
+  el.innerHTML=msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),4500);
+}
+
+// LINEボタン：クリップボードにコピー → LINEを開く
+document.getElementById("lineBtn").addEventListener("click",function(e){
+  e.preventDefault();
+  const text=buildLineMessage();
+  const openLine=()=>window.open("https://line.me/R/ti/p/@710sifho","_blank");
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast('<span class="toast-icon">📋</span>メッセージをコピーしました！<br>LINEが開いたら<strong>貼り付けて送信</strong>してください。');
+      setTimeout(openLine,600);
+    }).catch(openLine);
+  }else{
+    openLine();
+  }
+});
 
 document.getElementById("nameInput").addEventListener("input",updateLineUrl);
 document.getElementById("date1").addEventListener("change",checkTelHint);
@@ -654,5 +680,6 @@ window.addEventListener("scroll",()=>{
 setTimeout(()=>{document.querySelectorAll(".rev").forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight*.9)el.classList.add("vis");});},100);
 updateLineUrl();
 </script>
+<div id="toast" class="toast"></div>
 </body>
 </html>
