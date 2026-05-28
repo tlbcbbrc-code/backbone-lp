@@ -122,19 +122,52 @@ body{
   font-size:20px;font-weight:400;color:white;letter-spacing:.05em;
 }
 .seal-ring{position:absolute;inset:5px;border-radius:50%;border:.5px solid rgba(255,255,255,.3);}
-.letter{
-  position:absolute;bottom:6%;left:7%;right:7%;
-  background:#FEFCF8;border-radius:2px;padding:18px 16px 14px;z-index:2;
-  /* env-body(z:3)の後ろに隠れた状態からスタート。封筒の内側にある */
-  transform:translateY(5%);
-  transition:transform .9s cubic-bezier(.4,0,.2,1) .3s;
-  box-shadow:0 -4px 20px rgba(0,0,0,.09);
+/* ── Gift Card（封筒を開けた後に上から落下） ── */
+@keyframes gcDrop{
+  0%  {opacity:0;transform:translateY(-130px) rotate(-2.5deg);}
+  60% {opacity:1;transform:translateY(7px) rotate(.4deg);}
+  80% {transform:translateY(-3px) rotate(-.15deg);}
+  100%{opacity:1;transform:translateY(0) rotate(0deg);}
 }
-.env.open .letter{transform:translateY(-120%);}  /* 封筒の上にスライドアウト */
-.l-logo{font-family:"Cormorant Garamond",Georgia,serif;font-size:9px;letter-spacing:.35em;color:var(--red);text-transform:uppercase;font-style:italic;margin-bottom:6px;}
-.l-hr{height:.5px;background:var(--red-border);margin:5px 0;}
-.l-txt{font-size:8.5px;color:var(--gray);line-height:1.9;font-weight:300;}
-.l-txt strong{color:var(--navy);font-weight:500;}
+.gift-card{
+  display:none;
+  width:min(290px,82vw);
+  border-radius:12px;
+  background:linear-gradient(140deg,var(--navy) 0%,#0B1220 65%,#141F35 100%);
+  padding:20px 22px 18px;
+  position:relative;overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.28),inset 0 1px 0 rgba(184,146,74,.2);
+  margin-top:22px;
+}
+.gift-card::before{
+  content:"";position:absolute;top:0;right:0;width:160px;height:160px;
+  background:radial-gradient(circle at top right,rgba(184,146,74,.07),transparent 65%);
+  pointer-events:none;
+}
+.gift-card.drop{display:block;animation:gcDrop .78s cubic-bezier(.2,.8,.3,1) both;}
+.gc-eyebrow{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:9px;letter-spacing:.5em;color:rgba(184,146,74,.6);
+  text-transform:uppercase;font-style:italic;margin-bottom:11px;
+}
+.gc-logo{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:23px;font-weight:400;letter-spacing:.28em;color:rgba(255,255,255,.95);
+  text-transform:uppercase;margin-bottom:10px;
+}
+.gc-rule{height:.5px;width:65%;background:linear-gradient(90deg,rgba(184,146,74,.5),transparent);margin-bottom:12px;}
+.gc-main{
+  font-family:"Noto Serif JP",serif;
+  font-size:15px;font-weight:300;color:rgba(255,255,255,.85);
+  line-height:1.7;margin-bottom:14px;
+}
+.gc-foot{display:flex;align-items:flex-end;justify-content:space-between;}
+.gc-price{
+  font-family:"Cormorant Garamond",serif;
+  font-size:13px;color:rgba(184,146,74,.75);letter-spacing:.04em;
+}
+.gc-price em{font-style:normal;color:var(--gold-l);font-size:17px;}
+.gc-badge{font-family:"Cormorant Garamond",serif;font-size:9px;letter-spacing:.18em;color:rgba(255,255,255,.22);font-style:italic;}
 .tap-hint{
   margin-top:30px;
   font-family:"Cormorant Garamond",Georgia,serif;
@@ -361,19 +394,23 @@ body{
       <div class="env-r"></div>
       <div class="env-flap"></div>
       <div class="seal"><div class="seal-c"><div class="seal-ring"></div></div></div>
-      <!-- letter starts hidden inside envelope, slides up on open -->
-      <div class="letter" id="letter">
-        <p class="l-logo">BackBone</p>
-        <div class="l-hr"></div>
-        <p class="l-txt"><strong>大切な方へ</strong><br>このたびは特別なご案内をお届けできることを光栄に存じます。初回カウンセリングは当院からのギフトとしてご用意しております。</p>
-      </div>
+    </div>
+  </div>
+  <!-- ギフトカード：封筒を開けた後に上から落下 -->
+  <div class="gift-card" id="giftCard">
+    <p class="gc-eyebrow">Private Invitation</p>
+    <p class="gc-logo">BackBone</p>
+    <div class="gc-rule"></div>
+    <p class="gc-main">初回カウンセリング<br>無料ご招待</p>
+    <div class="gc-foot">
+      <span class="gc-price">通常 ¥5,500 → <em>無料</em></span>
+      <span class="gc-badge">完全紹介制</span>
     </div>
   </div>
   <p class="tap-hint" id="tapHint">Tap to open</p>
   <div class="inv-box" id="invBox" style="display:none;">
     <p class="inv-ttl">大切な方への、特別なご案内</p>
     <p class="inv-body">「大切な人に、今よりもっと健康でいてほしい」<br>そのご縁でお越しいただく方へ、<br>初回カウンセリングを無料でご用意しています。</p>
-    <div class="inv-gift">🎁 初回カウンセリング（通常5,500円）無料</div>
     <p class="scroll-cue">↓ スクロールして続きを読む</p>
   </div>
 </section>
@@ -786,7 +823,10 @@ document.getElementById("hero").addEventListener("click",()=>{
   document.getElementById("env").classList.add("open");
   document.getElementById("tapHint").style.display="none";
   document.getElementById("heroEyebrow").style.display="none";
-  setTimeout(()=>{document.getElementById("invBox").style.display="block";},700);
+  setTimeout(()=>{
+    document.getElementById("giftCard").classList.add("drop");  // ギフトカード落下開始
+    setTimeout(()=>{ document.getElementById("invBox").style.display="block"; },600); // テキスト出現
+  },700);
 });
 
 // Scroll
