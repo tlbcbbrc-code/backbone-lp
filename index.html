@@ -51,6 +51,25 @@ body{
 .rev{opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s ease;}
 .rev.vis{opacity:1;transform:translateY(0);}
 
+/* ══ HERO HEADING ══ */
+.hero-ttl-wrap{text-align:center;margin-bottom:32px;}
+.hero-ttl-en{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:11px;letter-spacing:.42em;color:var(--gold);
+  text-transform:uppercase;font-style:italic;display:block;margin-bottom:10px;
+}
+.hero-ttl-ja{
+  font-family:"Noto Serif JP",serif;
+  font-size:13px;letter-spacing:.18em;color:var(--gray);
+  font-weight:300;display:block;margin-bottom:6px;
+}
+.hero-ttl-brand{
+  font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:clamp(34px,9vw,46px);letter-spacing:.18em;
+  color:var(--navy);font-weight:400;text-transform:uppercase;
+  display:block;line-height:1.05;
+}
+
 /* ══ HERO ══ */
 .hero{
   min-height:100svh;background:linear-gradient(165deg,#FAFAF8 0%,#F3EFE8 100%);
@@ -70,9 +89,18 @@ body{
   width:min(310px,83vw);
   filter:drop-shadow(0 18px 52px rgba(0,0,0,.12));
   transition:transform .4s ease;
+  overflow:hidden;          /* レターが封筒の外に見えないよう隠す */
+  border-radius:3px;
 }
 .env-wrap:active{transform:scale(.98);}
 .env{width:100%;aspect-ratio:7/5;position:relative;perspective:700px;transform-style:preserve-3d;}
+/* 封筒フラップが開いた後の内側カラー（フラップ消失対策） */
+.env-interior{
+  position:absolute;top:0;left:0;right:0;height:56%;
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  background:linear-gradient(170deg,#EDE8DA,#E2DDD0);
+  z-index:0;border-radius:3px 3px 0 0;
+}
 .env-body{position:absolute;inset:0;background:linear-gradient(155deg,#FEFCF8,#EEE8DC);border-radius:3px;border:.5px solid rgba(184,146,74,.2);}
 .env-l{position:absolute;bottom:0;left:0;width:50%;height:100%;clip-path:polygon(0 0,0 100%,100% 100%);background:linear-gradient(135deg,#E8E2D4,#DEDAD0);}
 .env-r{position:absolute;bottom:0;right:0;width:50%;height:100%;clip-path:polygon(100% 0,0 100%,100% 100%);background:linear-gradient(225deg,#E2DDD0,#D8D2C4);}
@@ -321,9 +349,14 @@ body{
 
 <!-- ① 封筒 -->
 <section class="hero" id="hero">
-  <p class="hero-eyebrow" id="heroEyebrow">BackBone — Private Clinic</p>
+  <div class="hero-ttl-wrap" id="heroEyebrow">
+    <span class="hero-ttl-en">The Latest Bone Cure</span>
+    <span class="hero-ttl-ja">最先端骨格矯正</span>
+    <span class="hero-ttl-brand">BackBone</span>
+  </div>
   <div class="env-wrap">
     <div class="env" id="env">
+      <div class="env-interior"></div>
       <div class="env-body"></div>
       <div class="env-l"></div>
       <div class="env-r"></div>
@@ -503,8 +536,8 @@ body{
       <h3 style="font-family:'SF Pro Display',system-ui,-apple-system,sans-serif;font-size:21px;font-weight:600;color:var(--ink);margin-bottom:8px;letter-spacing:0.231px;">施術までの流れ</h3>
       <div class="bar"></div>
       <div class="flow-list">
-        <div class="flow-item"><div class="flow-l"><div class="flow-num">01</div><div class="flow-line"></div></div><div class="flow-r"><div class="flow-step-ttl">ご連絡（LINE / お電話）</div><div class="flow-step-body">「○○様からのご紹介」とお伝えください。ご希望の日時を調整してご連絡します。</div><div class="flow-gift">🎁 初回カウンセリング（5,500円）→ 無料</div></div></div>
-        <div class="flow-item"><div class="flow-l"><div class="flow-num">02</div><div class="flow-line"></div></div><div class="flow-r"><div class="flow-step-ttl">レントゲン撮影</div><div class="flow-step-body">提携医療機関で撮影していただきます。予約手配は当院が行います。撮影費用：8,800円</div></div></div>
+        <div class="flow-item"><div class="flow-l"><div class="flow-num">01</div><div class="flow-line"></div></div><div class="flow-r"><div class="flow-step-ttl">ご連絡（LINE / お電話）</div><div class="flow-step-body">「○○様からのご紹介」とお伝えください。レントゲン撮影のご希望日時をお知らせいただき、日程を調整します。</div><div class="flow-gift">🎁 ご紹介者でのご来院：初回カウンセリング 無料</div></div></div>
+        <div class="flow-item"><div class="flow-l"><div class="flow-num">02</div><div class="flow-line"></div></div><div class="flow-r"><div class="flow-step-ttl">レントゲン撮影（提携医療機関）</div><div class="flow-step-body">提携医療機関で撮影していただきます。予約手配は当院が行います。撮影費用：8,800円<br><span style="font-size:12px;color:var(--red);margin-top:6px;display:block;">※ レントゲン分析に約1週間必要なため、カウンセリングは後日別日程となります。</span></div></div></div>
         <div class="flow-item"><div class="flow-l"><div class="flow-num">03</div><div class="flow-line"></div></div><div class="flow-r"><div class="flow-step-ttl">カウンセリング・状態説明（約60分）</div><div class="flow-step-body">レントゲン画像をもとに骨格の状態を詳しくご説明します。「ご自身の体を知る」ことが出発点です。</div></div></div>
         <div class="flow-item"><div class="flow-l"><div class="flow-num">04</div><div class="flow-line"></div></div><div class="flow-r"><div class="flow-step-ttl">施術（骨格矯正）</div><div class="flow-step-body">1度・1ミリ単位で正確に矯正します。薬・手術不要の安全な施術です。</div></div></div>
       </div>
@@ -520,7 +553,7 @@ body{
         <span class="eyebrow">Contact</span>
         <h2 class="sec-ttl">まずは気軽に<br>ご相談ください</h2>
         <div class="bar" style="margin:14px auto 18px;"></div>
-        <p class="sec-body">初回カウンセリング（通常5,500円）は無料です。<br>ご希望の日時をお知らせいただければ、日程を調整してご連絡します。</p>
+        <p class="sec-body">ご紹介者でのご来院の場合、初回カウンセリングは無料です。<br>レントゲン撮影のご希望の日時をお知らせいただければ、日程を調整してご連絡します。</p>
       </div>
       <div id="selConfirm" style="display:none;" class="sel-confirm">
         <p class="sel-confirm-l">選択された症状</p>
@@ -575,7 +608,8 @@ const SYMS=[
   {id:"headache",name:"頭痛・めまい",area:"頭部・前庭系",sites:["c1c2"],cause:{site:"C1/C2（上部頸椎）",txt:"第一頸椎（C1）周辺のバランスが崩れている場合、椎骨動脈や周辺神経への影響が生じる<em>可能性があります</em>。頭痛やめまいとの関連が示唆されることがあります。"}},
   {id:"neck",name:"首・肩のこり・痛み",area:"頸椎・肩甲帯",sites:["cspine"],cause:{site:"C3〜C7（下部頸椎）",txt:"頸椎カーブの乱れや椎間板への負荷が、首・肩まわりの慢性的な不調に関係している<em>可能性があります</em>。"}},
   {id:"back",name:"腰痛・背部痛",area:"腰椎・仙椎",sites:["lumbar","pelvis"],cause:{site:"骨盤＋腰椎（L4/L5周辺）",txt:"骨盤のバランスの乱れが腰椎全体に影響し、特定の椎間板への負担につながる<em>可能性があります</em>。"}},
-  {id:"numb",name:"手足のしびれ",area:"末梢神経・神経孔",sites:["c1c2","lumbar","nerve"],cause:{site:"頸椎・腰椎（神経孔周辺）",txt:"骨格の位置関係によって神経孔が狭くなり、神経への影響が生じる<em>可能性があります</em>。しびれが続く場合、骨格的な要因の確認をお勧めします。"}},
+  {id:"numb-hand",name:"手・腕のしびれ",area:"頸椎・上肢神経",sites:["c1c2","cspine","nerve"],cause:{site:"頸椎（神経孔周辺）",txt:"頸椎の位置関係によって神経孔が狭くなり、腕・手への神経への影響が生じる<em>可能性があります</em>。"}},
+  {id:"numb-foot",name:"足・脚のしびれ",area:"腰椎・坐骨神経",sites:["lumbar","pelvis","nerve"],cause:{site:"腰椎・骨盤（神経孔周辺）",txt:"腰椎や骨盤の位置関係によって坐骨神経などへの影響が生じる<em>可能性があります</em>。"}},
   {id:"fatigue",name:"慢性疲労・だるさ",area:"自律神経系",sites:["cspine","thoracic"],cause:{site:"胸椎・頸椎移行部",txt:"脊柱まわりの骨格バランスの乱れが自律神経の通り道に影響し、疲労感や回復力の低下に関係する<em>可能性があります</em>。"}},
   {id:"sleep",name:"不眠・睡眠の浅さ",area:"脳幹・自律神経",sites:["c1c2"],cause:{site:"C1/C2・頭蓋底周辺",txt:"上部頸椎周辺のバランスが自律神経の調整機能に影響し、睡眠の質に関係する<em>可能性があります</em>。"}},
   {id:"gastro",name:"胃腸・内臓の不調",area:"内臓・迷走神経",sites:["thoracic"],cause:{site:"胸椎（T5〜T9周辺）",txt:"胸椎周辺のバランスが迷走神経（消化器系を支配する自律神経）に影響する<em>可能性があります</em>。"}},
