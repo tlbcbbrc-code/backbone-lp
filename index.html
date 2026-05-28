@@ -129,45 +129,103 @@ body{
   80% {transform:translateY(-3px) rotate(-.15deg);}
   100%{opacity:1;transform:translateY(0) rotate(0deg);}
 }
+@keyframes goldShimmer{0%{background-position:0% center}100%{background-position:200% center}}
 .gift-card{
   display:none;
-  width:min(290px,82vw);
-  border-radius:12px;
-  background:linear-gradient(140deg,var(--navy) 0%,#0B1220 65%,#141F35 100%);
-  padding:20px 22px 18px;
+  width:min(310px,86vw);
+  border-radius:16px;
+  background:
+    radial-gradient(ellipse at 12% 82%,rgba(184,146,74,.11) 0%,transparent 52%),
+    radial-gradient(ellipse at 88% 18%,rgba(184,146,74,.08) 0%,transparent 52%),
+    linear-gradient(148deg,#131E30 0%,#0C1520 50%,#080E1A 100%);
+  padding:26px 26px 22px;
   position:relative;overflow:hidden;
-  box-shadow:0 24px 64px rgba(0,0,0,.28),inset 0 1px 0 rgba(184,146,74,.2);
+  border:.5px solid rgba(184,146,74,.32);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 32px 80px rgba(0,0,0,.55),
+    0 8px 24px rgba(0,0,0,.3),
+    inset 0 1px 0 rgba(255,255,255,.09),
+    inset 0 -1px 0 rgba(0,0,0,.4);
   margin-top:22px;
 }
+/* 斜め光彩（プレミアムカード質感） */
 .gift-card::before{
-  content:"";position:absolute;top:0;right:0;width:160px;height:160px;
-  background:radial-gradient(circle at top right,rgba(184,146,74,.07),transparent 65%);
-  pointer-events:none;
+  content:"";position:absolute;top:-50%;left:-35%;
+  width:70%;height:200%;
+  background:linear-gradient(to bottom right,
+    rgba(255,255,255,.045) 0%,rgba(255,255,255,.02) 40%,transparent 60%);
+  transform:rotate(18deg);pointer-events:none;
+}
+/* 上部ゴールドシマーライン */
+.gift-card::after{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(212,170,106,.65) 50%,transparent 100%);
 }
 .gift-card.drop{display:block;animation:gcDrop .78s cubic-bezier(.2,.8,.3,1) both;}
+
+/* ヘッダー行：eyebrow + モノグラム */
+.gc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
 .gc-eyebrow{
   font-family:"Cormorant Garamond",Georgia,serif;
-  font-size:9px;letter-spacing:.5em;color:rgba(184,146,74,.6);
-  text-transform:uppercase;font-style:italic;margin-bottom:11px;
+  font-size:8.5px;letter-spacing:.55em;color:rgba(184,146,74,.52);
+  text-transform:uppercase;font-style:italic;padding-top:6px;
 }
+.gc-monogram{
+  width:34px;height:34px;border-radius:50%;
+  border:.5px solid rgba(184,146,74,.3);
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 40% 35%,rgba(184,146,74,.12),rgba(184,146,74,.04));
+  flex-shrink:0;
+}
+.gc-monogram-b{
+  font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:400;
+  background:linear-gradient(145deg,#C9A55A 0%,#F0D080 50%,#B8924A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:.02em;
+}
+/* ゴールドフォイル BACKBONE */
 .gc-logo{
   font-family:"Cormorant Garamond",Georgia,serif;
-  font-size:23px;font-weight:400;letter-spacing:.28em;color:rgba(255,255,255,.95);
-  text-transform:uppercase;margin-bottom:10px;
+  font-size:27px;font-weight:400;letter-spacing:.30em;text-transform:uppercase;
+  background:linear-gradient(120deg,#A07830 0%,#E8C96A 22%,#C9A55A 42%,#F5DC88 58%,#C9A55A 75%,#D4AA6A 88%,#A07830 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:goldShimmer 4.5s linear infinite;
+  margin-bottom:14px;
 }
-.gc-rule{height:.5px;width:65%;background:linear-gradient(90deg,rgba(184,146,74,.5),transparent);margin-bottom:12px;}
+/* 区切りライン */
+.gc-rule{
+  height:.5px;width:100%;margin-bottom:18px;
+  background:linear-gradient(90deg,rgba(184,146,74,.55),rgba(184,146,74,.15),transparent);
+}
+/* メインテキスト */
 .gc-main{
   font-family:"Noto Serif JP",serif;
-  font-size:15px;font-weight:300;color:rgba(255,255,255,.85);
-  line-height:1.7;margin-bottom:14px;
+  font-size:16px;font-weight:300;color:rgba(255,255,255,.88);
+  line-height:1.8;margin-bottom:20px;letter-spacing:.05em;
 }
+/* フッター */
+.gc-divider{height:.5px;background:rgba(255,255,255,.05);margin-bottom:14px;}
 .gc-foot{display:flex;align-items:flex-end;justify-content:space-between;}
-.gc-price{
-  font-family:"Cormorant Garamond",serif;
-  font-size:13px;color:rgba(184,146,74,.75);letter-spacing:.04em;
+.gc-price-wrap{}
+.gc-price-label{
+  font-family:"Cormorant Garamond",serif;font-size:9.5px;
+  letter-spacing:.22em;color:rgba(184,146,74,.5);
+  text-transform:uppercase;margin-bottom:3px;
 }
-.gc-price em{font-style:normal;color:var(--gold-l);font-size:17px;}
-.gc-badge{font-family:"Cormorant Garamond",serif;font-size:9px;letter-spacing:.18em;color:rgba(255,255,255,.22);font-style:italic;}
+.gc-price-val{
+  font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:400;
+  background:linear-gradient(135deg,#C9A55A 0%,#F5DC88 50%,#C9A55A 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:.06em;
+}
+.gc-badge{text-align:right;}
+.gc-badge p{
+  font-family:"Cormorant Garamond",serif;font-size:8.5px;letter-spacing:.2em;
+  color:rgba(255,255,255,.18);font-style:italic;line-height:1.9;
+}
 .tap-hint{
   margin-top:30px;
   font-family:"Cormorant Garamond",Georgia,serif;
@@ -398,13 +456,23 @@ body{
   </div>
   <!-- ギフトカード：封筒を開けた後に上から落下 -->
   <div class="gift-card" id="giftCard">
-    <p class="gc-eyebrow">Private Invitation</p>
+    <div class="gc-header">
+      <p class="gc-eyebrow">Private Invitation</p>
+      <div class="gc-monogram"><span class="gc-monogram-b">B</span></div>
+    </div>
     <p class="gc-logo">BackBone</p>
     <div class="gc-rule"></div>
     <p class="gc-main">初回カウンセリング<br>無料ご招待</p>
+    <div class="gc-divider"></div>
     <div class="gc-foot">
-      <span class="gc-price">通常 ¥5,500 → <em>無料</em></span>
-      <span class="gc-badge">完全紹介制</span>
+      <div class="gc-price-wrap">
+        <p class="gc-price-label">Free Counseling</p>
+        <p class="gc-price-val">無料</p>
+      </div>
+      <div class="gc-badge">
+        <p>完全紹介制</p>
+        <p>骨格矯正専門院</p>
+      </div>
     </div>
   </div>
   <p class="tap-hint" id="tapHint">Tap to open</p>
