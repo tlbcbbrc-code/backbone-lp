@@ -262,6 +262,8 @@ body{
 .form-in{width:100%;padding:14px 17px;background:rgba(255,255,255,.06);border:.5px solid rgba(255,255,255,.13);border-radius:10px;color:white;font-family:"Noto Sans JP",system-ui,sans-serif;font-size:15px;font-weight:300;outline:none;transition:border-color .25s;-webkit-appearance:none;}
 .form-in::placeholder{color:rgba(255,255,255,.2);}
 .form-in:focus{border-color:rgba(184,146,74,.5);background:rgba(255,255,255,.08);}
+.form-in.err{border-color:rgba(239,80,80,.7)!important;background:rgba(239,80,80,.06)!important;}
+.form-in.err:focus{border-color:rgba(239,80,80,.9)!important;}
 .line-btn{display:flex;align-items:center;justify-content:center;gap:11px;width:100%;padding:17px 20px;margin-top:22px;background:var(--green);border:none;border-radius:10px;color:white;font-family:"Noto Sans JP",system-ui,sans-serif;font-size:15px;font-weight:400;cursor:pointer;text-decoration:none;transition:opacity .2s;}
 .line-btn:active{opacity:.85;}
 .line-ic{width:24px;height:24px;background:white;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:var(--green);flex-shrink:0;font-family:sans-serif;}
@@ -693,9 +695,24 @@ function showToast(msg){
   setTimeout(()=>el.classList.remove("show"),4500);
 }
 
-// LINEボタン：クリップボードにコピー → LINEを開く
+// LINEボタン：バリデーション → クリップボードにコピー → LINEを開く
 document.getElementById("lineBtn").addEventListener("click",function(e){
   e.preventDefault();
+  const nameEl=document.getElementById("nameInput");
+  const date1El=document.getElementById("date1");
+  nameEl.classList.remove("err");
+  date1El.classList.remove("err");
+
+  const missing=[];
+  if(!nameEl.value.trim()){nameEl.classList.add("err");missing.push("お名前");}
+  if(!date1El.value){date1El.classList.add("err");missing.push("第一希望日");}
+
+  if(missing.length>0){
+    showToast('<span class="toast-icon">⚠️</span><strong>'+missing.join("・")+'</strong>をご入力ください');
+    (missing[0]==="お名前"?nameEl:date1El).scrollIntoView({behavior:"smooth",block:"center"});
+    return;
+  }
+
   const text=buildLineMessage();
   const openLine=()=>window.open("https://line.me/R/ti/p/@710sifho","_blank");
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -708,8 +725,12 @@ document.getElementById("lineBtn").addEventListener("click",function(e){
   }
 });
 
-document.getElementById("nameInput").addEventListener("input",updateLineUrl);
-document.getElementById("date1").addEventListener("change",checkTelHint);
+document.getElementById("nameInput").addEventListener("input",function(){
+  this.classList.remove("err"); updateLineUrl();
+});
+document.getElementById("date1").addEventListener("change",function(){
+  this.classList.remove("err"); checkTelHint();
+});
 document.getElementById("date2").addEventListener("change",checkTelHint);
 
 // FAQ
