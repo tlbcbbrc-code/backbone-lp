@@ -451,13 +451,14 @@ body{background:var(--bg);color:var(--gray-d);font-family:"Noto Sans JP",sans-se
         <p class="sel-confirm-v" id="selConfirmVal"></p>
       </div>
       <div class="rev" style="transition-delay:.1s;">
+        <div class="form-grp"><label class="form-lbl">お名前</label><input type="text" class="form-in" id="nameInput" placeholder="例：山田 太郎" autocomplete="name"></div>
         <p class="avail-note">📅 受付可能日：<strong>月・水・木・金曜日</strong>の<strong>午後のみ</strong><br>その他の日程はお電話でご相談ください。</p>
         <div class="form-grp"><label class="form-lbl">第一希望日</label><div class="form-sel-wrap"><select class="form-in form-sel" id="date1"><option value="">日程を選択してください</option></select></div></div>
         <div class="form-grp"><label class="form-lbl">第二希望日（任意）</label><div class="form-sel-wrap"><select class="form-in form-sel" id="date2"><option value="">第二希望があれば選択</option></select></div></div>
         <div id="telHint" style="display:none;" class="tel-hint-box">その他の日程はお電話にてご相談ください<strong>☎ 06-6926-8433</strong></div>
         <a href="#" class="line-btn" id="lineBtn"><div class="line-ic">L</div>LINEから予約・ご相談する</a>
         <a href="tel:0669268433" class="tel-btn">☎ 06-6926-8433</a>
-        <p class="cta-note">LINEボタンを押すと、症状と希望日が自動で入力されます。<br>送信前にご内容をご確認ください。<br>完全紹介制のため、ご紹介を受けた方のみご来院いただけます。</p>
+        <p class="cta-note">LINEボタンを押すと、お名前・症状・希望日が自動で入力されます。<br>送信前にご内容をご確認ください。<br>完全紹介制のため、ご紹介を受けた方のみご来院いただけます。</p>
       </div>
     </div>
   </div>
@@ -600,20 +601,23 @@ function checkTelHint(){
 function updateLineUrl(){
   const arr=SYMS.filter(s=>sel.has(s.id));
   const syms=arr.length?arr.map(s=>s.name).join("・"):"未選択";
+  const name=document.getElementById("nameInput").value.trim()||"未入力";
   const v1=document.getElementById("date1").value;
   const v2=document.getElementById("date2").value;
   const d1=v1==="tel"?"お電話にてご相談希望":v1||"未定";
   const d2=v2==="tel"?"お電話にてご相談希望":v2||"未定";
   const t=`【BackBone 初回カウンセリング予約】
 
+お名前：${name}
 お悩み：${syms}
 第一希望：${d1}
 第二希望：${d2}
 
 ※ 紹介カードからのご予約`;
-  document.getElementById("lineBtn").href=`https://line.me/R/oaMessage/@n2xWrRo/?text=${encodeURIComponent(t)}`;
+  document.getElementById("lineBtn").href=`https://line.me/R/oaMessage/@710sifho?text=${encodeURIComponent(t)}`;
 }
 
+document.getElementById("nameInput").addEventListener("input",updateLineUrl);
 document.getElementById("date1").addEventListener("change",checkTelHint);
 document.getElementById("date2").addEventListener("change",checkTelHint);
 
