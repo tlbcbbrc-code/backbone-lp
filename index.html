@@ -97,11 +97,11 @@ body{
   position:absolute;top:0;left:0;right:0;height:56%;
   clip-path:polygon(0 0,100% 0,50% 100%);
   background:linear-gradient(170deg,#EDE8DA,#E2DDD0);
-  z-index:0;border-radius:3px 3px 0 0;
+  z-index:4;border-radius:3px 3px 0 0;   /* env-body より上 → フラップ開封後に内側カラーが見える */
 }
-.env-body{position:absolute;inset:0;background:linear-gradient(155deg,#FEFCF8,#EEE8DC);border-radius:3px;border:.5px solid rgba(184,146,74,.2);}
-.env-l{position:absolute;bottom:0;left:0;width:50%;height:100%;clip-path:polygon(0 0,0 100%,100% 100%);background:linear-gradient(135deg,#E8E2D4,#DEDAD0);}
-.env-r{position:absolute;bottom:0;right:0;width:50%;height:100%;clip-path:polygon(100% 0,0 100%,100% 100%);background:linear-gradient(225deg,#E2DDD0,#D8D2C4);}
+.env-body{position:absolute;inset:0;background:linear-gradient(155deg,#FEFCF8,#EEE8DC);border-radius:3px;border:.5px solid rgba(184,146,74,.2);z-index:3;}
+.env-l{position:absolute;bottom:0;left:0;width:50%;height:100%;clip-path:polygon(0 0,0 100%,100% 100%);background:linear-gradient(135deg,#E8E2D4,#DEDAD0);z-index:3;}
+.env-r{position:absolute;bottom:0;right:0;width:50%;height:100%;clip-path:polygon(100% 0,0 100%,100% 100%);background:linear-gradient(225deg,#E2DDD0,#D8D2C4);z-index:3;}
 .env-flap{
   position:absolute;top:0;left:0;right:0;height:56%;clip-path:polygon(0 0,100% 0,50% 100%);
   background:linear-gradient(155deg,#F2EDE0,#E4DCCC);transform-origin:top center;
@@ -124,12 +124,13 @@ body{
 .seal-ring{position:absolute;inset:5px;border-radius:50%;border:.5px solid rgba(255,255,255,.3);}
 .letter{
   position:absolute;bottom:6%;left:7%;right:7%;
-  background:#FEFCF8;border-radius:2px;padding:18px 16px 14px;z-index:5;
-  transform:translateY(100%);opacity:0;
-  transition:transform .9s cubic-bezier(.4,0,.2,1) .25s, opacity .4s ease .3s;
+  background:#FEFCF8;border-radius:2px;padding:18px 16px 14px;z-index:2;
+  /* env-body(z:3)の後ろに隠れた状態からスタート。封筒の内側にある */
+  transform:translateY(5%);
+  transition:transform .9s cubic-bezier(.4,0,.2,1) .3s;
   box-shadow:0 -4px 20px rgba(0,0,0,.09);
 }
-.env.open .letter{transform:translateY(-28%);opacity:1;}
+.env.open .letter{transform:translateY(-120%);}  /* 封筒の上にスライドアウト */
 .l-logo{font-family:"Cormorant Garamond",Georgia,serif;font-size:9px;letter-spacing:.35em;color:var(--red);text-transform:uppercase;font-style:italic;margin-bottom:6px;}
 .l-hr{height:.5px;background:var(--red-border);margin:5px 0;}
 .l-txt{font-size:8.5px;color:var(--gray);line-height:1.9;font-weight:300;}
