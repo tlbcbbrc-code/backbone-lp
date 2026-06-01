@@ -810,7 +810,13 @@ function showToast(msg){
   setTimeout(()=>el.classList.remove("show"),4500);
 }
 
-// LINEボタン：バリデーション → クリップボードにコピー → LINEを開く
+// ================================================================
+// ▼ 設定：LINE Developers で取得した LIFF ID を入力してください
+// ================================================================
+const LIFF_ID = 'YOUR_LIFF_ID'; // 例: '1234567890-AbCdEfGh'
+// ================================================================
+
+// LINEボタン：バリデーション → LIFF URL を開く
 document.getElementById("lineBtn").addEventListener("click",function(e){
   e.preventDefault();
   const nameEl=document.getElementById("nameInput");
@@ -828,10 +834,16 @@ document.getElementById("lineBtn").addEventListener("click",function(e){
     return;
   }
 
-  const text=buildLineMessage();
-  // メッセージモーダルを表示
-  document.getElementById("msgText").value=text;
-  document.getElementById("msgOverlay").classList.add("show");
+  // LIFF へ渡すパラメータを組み立て
+  const arr=SYMS.filter(s=>sel.has(s.id));
+  const params=new URLSearchParams({
+    n : nameEl.value.trim(),
+    d1: document.getElementById("date1").value||"",
+    d2: document.getElementById("date2").value||"",
+    sy: arr.map(s=>s.name).join("・"),
+  });
+  const liffUrl=`https://liff.line.me/${LIFF_ID}?${params.toString()}`;
+  window.open(liffUrl,"_blank");
 });
 
 document.getElementById("nameInput").addEventListener("input",function(){

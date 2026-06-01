@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BackBone — 予約確認</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;400&display=swap" rel="stylesheet">
+
+<!-- ▼ LIFF SDK -->
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#1A2438;--red:#8B0026;--gold:#B8924A;
+  --green:#06C755;--gray:#5A5A5A;--gray-l:#8A8A8A;
+  --line:#E6E6E6;--bg:#F7F6F4;
+}
+html,body{
+  min-height:100%;background:var(--bg);
+  font-family:"Noto Sans JP",sans-serif;font-weight:300;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── 初期化中 ── */
+#loading{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+}
+.spinner{
+  width:36px;height:36px;border:3px solid var(--line);
+  border-top-color:var(--green);border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:13px;color:var(--gray-l);}
+
+/* ── メインコンテンツ ── */
+#app{display:none;max-width:430px;margin:0 auto;padding:28px 16px 48px;}
+
+/* ヘッダー */
+.app-head{
+  background:linear-gradient(135deg,var(--navy),#0D1520);
+  border-radius:16px;padding:22px;
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:16px;
+}
+.head-circle{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  border:1px solid rgba(184,146,74,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Cormorant Garamond",serif;font-size:18px;
+  color:rgba(212,170,106,.9);
+}
+.head-name{
+  font-family:"Cormorant Garamond",serif;font-size:16px;
+  letter-spacing:.22em;color:white;text-transform:uppercase;
+}
+.head-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:3px;}
+
+/* 確認カード */
+.card{
+  background:white;border-radius:16px;
+  box-shadow:0 2px 16px rgba(0,0,0,.07);
+  overflow:hidden;margin-bottom:14px;
+}
+.card-inner{padding:22px;}
+.card-ttl{
+  font-family:"Cormorant Garamond",serif;font-size:10px;
+  letter-spacing:.35em;color:var(--gold);text-transform:uppercase;
+  font-style:italic;margin-bottom:16px;
+}
+.row{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  padding:11px 0;border-bottom:1px solid var(--line);gap:12px;
+}
+.row:last-child{border-bottom:none;padding-bottom:0;}
+.row-key{font-size:12px;color:var(--gray-l);flex-shrink:0;}
+.row-val{font-size:14px;color:var(--navy);font-weight:400;text-align:right;}
+
+/* 送信ボタン */
+.send-btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;padding:16px;background:var(--green);border:none;
+  border-radius:12px;color:white;font-size:15px;font-weight:500;
+  font-family:"Noto Sans JP",sans-serif;cursor:pointer;
+  box-shadow:0 4px 20px rgba(6,199,85,.3);transition:opacity .2s;
+  margin-bottom:10px;
+}
+.send-btn:active{opacity:.85;}
+.send-btn:disabled{opacity:.5;cursor:not-allowed;}
+.cancel-btn{
+  width:100%;padding:13px;background:none;
+  border:1px solid var(--line);border-radius:12px;
+  color:var(--gray);font-size:14px;cursor:pointer;
+  font-family:"Noto Sans JP",sans-serif;
+}
+.note{
+  font-size:11.5px;color:var(--gray-l);line-height:1.85;
+  text-align:center;margin-top:18px;
+}
+
+/* 送信中オーバーレイ */
+#sending{
+  display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);
+  flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:100;
+}
+#sending.show{display:flex;}
+#sending .spinner{border-top-color:var(--green);}
+#sending p{font-size:13px;color:var(--gray);}
+
+/* 完了画面 */
+#done{
+  display:none;max-width:430px;margin:0 auto;
+  padding:60px 24px 48px;text-align:center;
+}
+#done.show{display:block;}
+.done-icon{font-size:52px;margin-bottom:20px;}
+.done-ttl{
+  font-family:"Noto Serif JP",serif;font-size:22px;
+  font-weight:400;color:var(--navy);line-height:1.6;margin-bottom:14px;
+}
+.done-body{font-size:14px;color:var(--gray);line-height:2.1;margin-bottom:32px;}
+.done-close{
+  display:inline-block;padding:14px 36px;background:var(--navy);
+  border:none;border-radius:12px;color:white;font-size:14px;
+  font-family:"Noto Sans JP",sans-serif;cursor:pointer;
+}
+
+/* エラー */
+#error-msg{
+  display:none;background:#FDF1F4;border:.5px solid #F2C4CF;
+  border-radius:10px;padding:14px 16px;margin-top:12px;
+  font-size:13px;color:var(--red);line-height:1.8;
+}
+#error-msg.show{display:block;}
+</style>
+</head>
+<body>
+
+<!-- 初期化中 -->
+<div id="loading">
+  <div class="spinner"></div>
+  <p class="loading-txt">読み込み中...</p>
+</div>
+
+<!-- 送信中オーバーレイ -->
+<div id="sending">
+  <div class="spinner"></div>
+  <p>BackBone に送信中…</p>
+</div>
+
+<!-- 確認画面 -->
+<div id="app">
+  <div class="app-head">
+    <div class="head-circle">B</div>
+    <div>
+      <p class="head-name">BackBone</p>
+      <p class="head-sub">完全紹介制 骨格矯正専門院</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <p class="card-ttl">送信内容の確認</p>
+      <div id="rows"></div>
+    </div>
+  </div>
+
+  <button class="send-btn" id="sendBtn">✓ &nbsp;この内容で予約リクエストを送信</button>
+  <button class="cancel-btn" id="cancelBtn">修正する（前の画面に戻る）</button>
+  <div id="error-msg"></div>
+  <p class="note">送信後、クリニックより LINE にて<br>2営業日以内にご連絡いたします。</p>
+</div>
+
+<!-- 送信完了画面 -->
+<div id="done">
+  <p class="done-icon">✅</p>
+  <p class="done-ttl">予約リクエストを<br>送信しました</p>
+  <p class="done-body">担当スタッフが内容を確認後、<br><strong>2営業日以内</strong>にこちらの LINE より<br>ご連絡いたします。</p>
+  <button class="done-close" id="doneClose">閉じる</button>
+</div>
+
+<script>
+// ================================================================
+// ▼ 設定：LINE Developers で取得した LIFF ID を入力してください
+// ================================================================
+const LIFF_ID = 'YOUR_LIFF_ID'; // 例: '1234567890-AbCdEfGh'
+// ================================================================
+
+(async () => {
+  // ── URL パラメータ取得 ──
+  const p  = new URLSearchParams(location.search);
+  const n  = p.get('n')  || '';   // 氏名
+  const d1 = p.get('d1') || '';   // 第一希望日
+  const d2 = p.get('d2') || '';   // 第二希望日
+  const sy = p.get('sy') || '';   // 症状
+
+  // ── 確認テーブルを組み立て ──
+  const rows = [{ k: 'お名前', v: n }, { k: '第一希望日', v: d1 }];
+  if (d2) rows.push({ k: '第二希望日', v: d2 });
+  if (sy) rows.push({ k: 'お悩み', v: sy });
+  document.getElementById('rows').innerHTML = rows.map(r =>
+    `<div class="row"><span class="row-key">${r.k}</span><span class="row-val">${r.v}</span></div>`
+  ).join('');
+
+  // ── LIFF 初期化 ──
+  try {
+    await liff.init({ liffId: LIFF_ID });
+  } catch (e) {
+    console.error('LIFF init error:', e);
+    // LIFF 外（ブラウザ直アクセス）でも動作するよう続行
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display     = 'block';
+
+  // ── 送信ボタン ──
+  document.getElementById('sendBtn').addEventListener('click', async () => {
+    if (!n || !d1) {
+      showError('お名前と第一希望日が取得できませんでした。LP に戻って再度お試しください。');
+      return;
+    }
+
+    document.getElementById('sending').classList.add('show');
+    document.getElementById('sendBtn').disabled = true;
+    document.getElementById('error-msg').classList.remove('show');
+
+    try {
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: n, d1, d2, sy }),
+      });
+
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+
+      // 完了画面へ
+      document.getElementById('sending').classList.remove('show');
+      document.getElementById('app').style.display  = 'none';
+      document.getElementById('done').classList.add('show');
+
+    } catch (e) {
+      console.error(e);
+      document.getElementById('sending').classList.remove('show');
+      document.getElementById('sendBtn').disabled = false;
+      showError('送信に失敗しました。通信環境をご確認のうえ、再度お試しください。');
+    }
+  });
+
+  // ── キャンセル ──
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    if (liff.isInClient()) {
+      liff.closeWindow();
+    } else {
+      history.back();
+    }
+  });
+
+  // ── 閉じる ──
+  document.getElementById('doneClose').addEventListener('click', () => {
+    if (liff.isInClient()) {
+      liff.closeWindow();
+    } else {
+      location.href = '/';
+    }
+  });
+})();
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+</script>
+</body>
+</html>
