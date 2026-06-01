@@ -815,15 +815,8 @@ document.getElementById("lineBtn").addEventListener("click",function(e){
   }
 
   const text=buildLineMessage();
-  const openLine=()=>window.open("https://line.me/R/ti/p/@710sifho","_blank");
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>{
-      showToast('<span class="toast-icon">📋</span>メッセージをコピーしました！<br>LINEが開いたら<strong>貼り付けて送信</strong>してください。');
-      setTimeout(openLine,600);
-    }).catch(openLine);
-  }else{
-    openLine();
-  }
+  const url="https://line.me/R/share?text="+encodeURIComponent(text);
+  window.open(url,"_blank");
 });
 
 document.getElementById("nameInput").addEventListener("input",function(){
