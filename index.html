@@ -403,20 +403,6 @@ body{
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast-icon{font-size:20px;display:block;margin-bottom:5px;}
 
-/* ── LINE メッセージモーダル ── */
-.msg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;}
-.msg-overlay.show{opacity:1;pointer-events:auto;}
-.msg-sheet{width:min(430px,100%);background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 40px;transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.8,.3,1);}
-.msg-overlay.show .msg-sheet{transform:translateY(0);}
-.msg-sheet-ttl{font-family:"Noto Serif JP",serif;font-size:16px;font-weight:400;color:var(--navy);margin-bottom:4px;}
-.msg-sheet-sub{font-size:12px;color:var(--gray-l);margin-bottom:18px;line-height:1.7;}
-.msg-sheet-sub strong{color:var(--red);}
-.msg-text{width:100%;background:var(--bg-s);border:.5px solid var(--line);border-radius:10px;padding:14px;font-size:13px;font-family:"Noto Sans JP",sans-serif;font-weight:300;color:var(--gray-d);line-height:1.9;resize:none;outline:none;min-height:160px;}
-.msg-actions{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
-.msg-copy-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:var(--navy);border:none;border-radius:10px;color:white;font-family:"Noto Sans JP",sans-serif;font-size:14px;font-weight:400;cursor:pointer;}
-.msg-line-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:var(--green);border:none;border-radius:10px;color:white;font-family:"Noto Sans JP",sans-serif;font-size:14px;font-weight:400;cursor:pointer;text-decoration:none;}
-.msg-close{width:100%;padding:12px;background:none;border:none;color:var(--gray-l);font-size:13px;cursor:pointer;margin-top:4px;}
-
 </style>
 </head>
 <body>
@@ -810,13 +796,7 @@ function showToast(msg){
   setTimeout(()=>el.classList.remove("show"),4500);
 }
 
-// ================================================================
-// ▼ 設定：LINE Developers で取得した LIFF ID を入力してください
-// ================================================================
-const LIFF_ID = 'YOUR_LIFF_ID'; // 例: '1234567890-AbCdEfGh'
-// ================================================================
-
-// LINEボタン：バリデーション → LIFF URL を開く
+// LINEボタン：バリデーション → クリップボードにコピー → LINEを開く
 document.getElementById("lineBtn").addEventListener("click",function(e){
   e.preventDefault();
   const nameEl=document.getElementById("nameInput");
@@ -834,16 +814,16 @@ document.getElementById("lineBtn").addEventListener("click",function(e){
     return;
   }
 
-  // LIFF へ渡すパラメータを組み立て
-  const arr=SYMS.filter(s=>sel.has(s.id));
-  const params=new URLSearchParams({
-    n : nameEl.value.trim(),
-    d1: document.getElementById("date1").value||"",
-    d2: document.getElementById("date2").value||"",
-    sy: arr.map(s=>s.name).join("・"),
-  });
-  const liffUrl=`https://liff.line.me/${LIFF_ID}?${params.toString()}`;
-  window.open(liffUrl,"_blank");
+  const text=buildLineMessage();
+  const openLine=()=>window.open("https://line.me/R/ti/p/@710sifho","_blank");
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast('<span class="toast-icon">📋</span>メッセージをコピーしました！<br>LINEが開いたら<strong>貼り付けて送信</strong>してください。');
+      setTimeout(openLine,600);
+    }).catch(openLine);
+  }else{
+    openLine();
+  }
 });
 
 document.getElementById("nameInput").addEventListener("input",function(){
@@ -853,28 +833,6 @@ document.getElementById("date1").addEventListener("change",function(){
   this.classList.remove("err"); checkTelHint();
 });
 document.getElementById("date2").addEventListener("change",checkTelHint);
-
-// メッセージモーダル操作
-document.getElementById("msgCopyBtn").addEventListener("click",function(){
-  const txt=document.getElementById("msgText").value;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>{
-      this.textContent="✅ コピーしました";
-      setTimeout(()=>{this.innerHTML='📋 メッセージをコピー';},2000);
-    });
-  }else{
-    document.getElementById("msgText").select();
-    document.execCommand("copy");
-    this.textContent="✅ コピーしました";
-    setTimeout(()=>{this.innerHTML='📋 メッセージをコピー';},2000);
-  }
-});
-document.getElementById("msgClose").addEventListener("click",function(){
-  document.getElementById("msgOverlay").classList.remove("show");
-});
-document.getElementById("msgOverlay").addEventListener("click",function(e){
-  if(e.target===this) this.classList.remove("show");
-});
 
 // FAQ
 document.getElementById("faqList").innerHTML=FAQS.map((f,i)=>`
@@ -913,23 +871,5 @@ setTimeout(()=>{document.querySelectorAll(".rev").forEach(el=>{if(el.getBounding
 updateLineUrl();
 </script>
 <div id="toast" class="toast"></div>
-
-<!-- LINE メッセージモーダル -->
-<div class="msg-overlay" id="msgOverlay">
-  <div class="msg-sheet">
-    <p class="msg-sheet-ttl">送信するメッセージ</p>
-    <p class="msg-sheet-sub">LINEで <strong>@BackBone</strong> を友達追加後、<br>このメッセージをコピーして貼り付けてください。</p>
-    <textarea class="msg-text" id="msgText" readonly></textarea>
-    <div class="msg-actions">
-      <button class="msg-copy-btn" id="msgCopyBtn">📋 メッセージをコピー</button>
-      <a class="msg-line-btn" id="msgLineBtn" href="https://line.me/R/ti/p/@710sifho" target="_blank">
-        <div style="width:20px;height:20px;background:white;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--green);flex-shrink:0;">L</div>
-        LINEで友達追加・送信
-      </a>
-      <button class="msg-close" id="msgClose">閉じる</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
